@@ -28,7 +28,7 @@ public class PersonaController{
             path = "/persona"
     )
     public ResponseEntity<Persona> cargarPersona(@Valid @RequestBody Persona persona){
-         String leyenda = personaService.postPersona(persona);
+         String leyenda = this.personaService.postPersona(persona);
          logger.info("Ver que me devuelve el metodo" + leyenda);
          if(leyenda.isEmpty()){
              return new ResponseEntity<>(persona,HttpStatusCode.valueOf(200));
@@ -39,11 +39,17 @@ public class PersonaController{
             method = RequestMethod.GET,
             path = "/persona/{id}"
     )
-    public ResponseEntity<Persona> cargarPersona(@PathVariable("id") Long id){
+    public ResponseEntity<String> obtenerPersona(@PathVariable("id") Long id){
 
-           Persona persona =  this.personaService.getPersonaPorId(id);
-           return  new ResponseEntity<>(persona,HttpStatusCode.valueOf(200));
+        String leyenda = String.valueOf(this.personaService.getPersonaPorId(id));
+        logger.info("Ver que me devuelve el metodo" + leyenda);
+        if(leyenda == "null"){
+            return new ResponseEntity<>("Id no se encuentra cargado",HttpStatusCode.valueOf(400));
         }
+        return new ResponseEntity<>(leyenda.toString(),HttpStatusCode.valueOf(200));
     }
+
+
+}
 
 

@@ -3,6 +3,7 @@ package com.example.challenge.service;
 
 import com.example.challenge.errorUnknown.ErrorUnknown;
 import com.example.challenge.errorUnknown.InputsVaciosException;
+import com.example.challenge.errorUnknown.PersonaNoExisteException;
 import com.example.challenge.errorUnknown.SoloLetrasException;
 import com.example.challenge.model.Persona;
 import com.example.challenge.repository.PersonaRepository;
@@ -35,6 +36,33 @@ public class PersonaService {
             return e.getMessage();
         }
     }
+
+    public Optional<String> getPersonaPorId(Long id){
+        try{
+            Persona persona = personaRepository.encontrarPersonaPorId(id);
+            if(persona.getId()== null){
+                throw  new Throwable();
+            }
+            this.personaRepository.findById(id).get();
+            return Optional.ofNullable(persona.toString());
+        }catch(Throwable throwable){
+            return null;
+        }
+    }
+
+
+    public String updatePersona(Persona persona){
+        
+    }
+
+
+
+
+
+
+
+
+
     public Integer validacion(Persona persona){
         if (soloLetras(persona.getApellido()) == false ||soloLetras(persona.getPais())== false
                 || soloLetras(persona.getNombre()) == false){
@@ -57,20 +85,4 @@ public class PersonaService {
         }
         return true;
     }
-
-
-    public Persona getPersonaPorId(Long id){
-       try{
-        Persona persona = personaRepository.encontrarPersonaPorId(id);
-        if(persona.getId() == null){
-            throw  new NullPointerException();
-        }
-        this.personaRepository.findById(id).get();
-        return  persona;
-    }catch(NullPointerException nullPointerException){
-           return  null;
-       }
-
-    }
-
 }
