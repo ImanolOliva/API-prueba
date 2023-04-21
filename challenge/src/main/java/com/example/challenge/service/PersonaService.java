@@ -7,6 +7,7 @@ import com.example.challenge.errorUnknown.PersonaNoExisteException;
 import com.example.challenge.errorUnknown.SoloLetrasException;
 import com.example.challenge.model.Persona;
 import com.example.challenge.repository.PersonaRepository;
+import jakarta.persistence.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class PersonaService {
             if(validacion(persona) == 0){
             throw new SoloLetrasException();
         }
-        if(validacion(persona) == -0){
+        if(validacion(persona) == 1){
             throw new InputsVaciosException();
         }
         personaRepository.save(persona);
@@ -51,17 +52,44 @@ public class PersonaService {
     }
 
 
-    public String updatePersona(Persona persona){
-        
+    public String updatePersona(Persona persona,Long id){
+        try{
+            Persona updatePersona = this.personaRepository.findById(id).get();
+
+            updatePersona.setNombre(persona.getNombre());
+            updatePersona.setApellido(persona.getApellido());
+            updatePersona.setDireccion(persona.getDireccion());
+            updatePersona.setPais(persona.getPais());
+            updatePersona.setTelefono(persona.getTelefono());
+            updatePersona.setFechaNacimiento(persona.getFechaNacimiento());
+
+            if(validacion(updatePersona)==0){
+                throw new SoloLetrasException();
+            }
+            if(validacion(updatePersona) == 1){
+                throw  new InputsVaciosException();
+            }
+            this.personaRepository.save(updatePersona);
+            return "";
+        }catch(ErrorUnknown errorUnknown){
+            return errorUnknown.getMessage();
+        }catch(Exception ex){
+            return ex.getMessage();
+        }
+
+}
+    public String deletePersona(Long id){
+        try{
+            Persona persona = this.personaRepository.encontrarPersonaPorId(id);
+            if(persona.getId() == null){
+                throw new Throwable();
+            }
+            this.personaRepository.deleteById(persona.getId());
+            return "ok";
+        }catch(Throwable throwable){
+           return null;
+        }
     }
-
-
-
-
-
-
-
-
 
     public Integer validacion(Persona persona){
         if (soloLetras(persona.getApellido()) == false ||soloLetras(persona.getPais())== false
@@ -71,9 +99,9 @@ public class PersonaService {
         if(persona.getFechaNacimiento() == null || persona.getDireccion() == null ||
         persona.getTelefono() == null || persona.getPais() == null || persona.getNombre() == null
         || persona.getApellido() == null){
-            return -0;
+            return 1;
         }
-        return 1;
+        return 2;
     }
     public boolean soloLetras(String cadena){
         for (int i = 0; i < cadena.length(); i++)

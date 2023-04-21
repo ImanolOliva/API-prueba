@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 public class PersonaController{
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger(PersonaController.class);
+
+
     @Autowired
     PersonaService personaService;
 
@@ -28,7 +30,7 @@ public class PersonaController{
             path = "/persona"
     )
     public ResponseEntity<Persona> cargarPersona(@Valid @RequestBody Persona persona){
-         String leyenda = this.personaService.postPersona(persona);
+        String leyenda = this.personaService.postPersona(persona);
          logger.info("Ver que me devuelve el metodo" + leyenda);
          if(leyenda.isEmpty()){
              return new ResponseEntity<>(persona,HttpStatusCode.valueOf(200));
@@ -50,6 +52,37 @@ public class PersonaController{
     }
 
 
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            path = "/persona/{id}"
+    )
+    public ResponseEntity<?> actualizarPersona(@PathVariable("id") Long id,@RequestBody Persona persona){
+
+        String leyenda = this.personaService.updatePersona(persona,id);
+        logger.info("Veo que me devuelve el metodo" + leyenda);
+        if(leyenda.isEmpty()){
+            return  new ResponseEntity<>(persona,HttpStatusCode.valueOf(200));
+        }
+        return  new ResponseEntity<>(leyenda,HttpStatusCode.valueOf(400));
+    }
+
+
+
+    @RequestMapping(
+            method = RequestMethod.DELETE,
+            path = "/persona/{id}"
+    )
+    public ResponseEntity<?> eliminarPersona(@PathVariable("id") Long id){
+
+        String leyenda = this.personaService.deletePersona(id);
+        logger.info("Veo que me devuelve el metodo" + leyenda);
+        if(leyenda == "ok"){
+            return  new ResponseEntity<>("Persona eliminado con exito",HttpStatusCode.valueOf(200));
+        }
+        return  new ResponseEntity<>("Id no encontrado",HttpStatusCode.valueOf(400));
+    }
+
 }
+
 
 
