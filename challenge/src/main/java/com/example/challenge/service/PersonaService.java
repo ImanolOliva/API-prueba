@@ -1,16 +1,14 @@
 package com.example.challenge.service;
 
 
-import com.example.challenge.errorUnknown.ErrorUnknown;
-import com.example.challenge.errorUnknown.InputsVaciosException;
-import com.example.challenge.errorUnknown.PersonaNoExisteException;
-import com.example.challenge.errorUnknown.SoloLetrasException;
+import com.example.challenge.errorUnknown.*;
 import com.example.challenge.model.Persona;
 import com.example.challenge.repository.PersonaRepository;
 import jakarta.persistence.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +16,7 @@ import java.util.Optional;
 public class PersonaService {
 
     @Autowired
-    PersonaRepository personaRepository;
+    private PersonaRepository personaRepository;
 
 
     public String postPersona(Persona persona){
@@ -29,7 +27,7 @@ public class PersonaService {
         if(validacion(persona) == 1){
             throw new InputsVaciosException();
         }
-        personaRepository.save(persona);
+        this.personaRepository.save(persona);
         return "";
         }catch(ErrorUnknown errorUnknown){
            return  errorUnknown.getMessage();
@@ -38,14 +36,20 @@ public class PersonaService {
         }
     }
 
-    public Optional<String> getPersonaPorId(Long id){
+
+        public List<Persona> getAllPersonas(){
+            List<Persona> list = this.personaRepository.findAll();
+            return  list;
+        }
+
+    public Persona getPersonaPorId(Long id){
         try{
-            Persona persona = personaRepository.encontrarPersonaPorId(id);
+            Persona persona = this.personaRepository.encontrarPersonaPorId(id);
             if(persona.getId()== null){
                 throw  new Throwable();
             }
             this.personaRepository.findById(id).get();
-            return Optional.ofNullable(persona.toString());
+            return persona;
         }catch(Throwable throwable){
             return null;
         }
@@ -78,14 +82,14 @@ public class PersonaService {
         }
 
 }
-    public String deletePersona(Long id){
+    public Persona deletePersona(Long id){
         try{
             Persona persona = this.personaRepository.encontrarPersonaPorId(id);
             if(persona.getId() == null){
                 throw new Throwable();
             }
-            this.personaRepository.deleteById(persona.getId());
-            return "ok";
+             this.personaRepository.deleteById(id);
+            return persona;
         }catch(Throwable throwable){
            return null;
         }
