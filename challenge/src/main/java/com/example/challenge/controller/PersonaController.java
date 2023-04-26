@@ -50,17 +50,12 @@ public class PersonaController{
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Persona> obtenerPersonas(Persona persona){
-        try{
             List<Persona> list = this.personaService.getAllPersonas();
             if(list.isEmpty()){
-                logger.debug("verificar la lista");
-                throw  new ListaVaciaException();
+                return new ResponseEntity(list,HttpStatusCode.valueOf(400));
             }
-            logger.info("obtengo la lista de productos");
             return new ResponseEntity(list,HttpStatusCode.valueOf(200));
-        }catch(ErrorUnknown errores){
-            return new ResponseEntity(errores.getMessage(),HttpStatusCode.valueOf(400));
-        }
+
     }
 
 
@@ -87,12 +82,11 @@ public class PersonaController{
     )
     public ResponseEntity<?> actualizarPersona(@PathVariable("id") Long id,@RequestBody Persona persona){
 
-        String leyenda = this.personaService.updatePersona(persona,id);
-        logger.info("Veo que me devuelve el metodo" + leyenda);
-        if(leyenda.isEmpty()){
+        persona = this.personaService.updatePersona(persona,id);
+        if(persona != null){
             return  new ResponseEntity<>(persona,HttpStatusCode.valueOf(200));
         }
-        return  new ResponseEntity<>(leyenda,HttpStatusCode.valueOf(400));
+        return  new ResponseEntity("no se pudo actualizar la persona",HttpStatusCode.valueOf(400));
     }
 
 
@@ -113,6 +107,20 @@ public class PersonaController{
         return  new ResponseEntity("Id no encontrado",HttpStatusCode.valueOf(400));
     }
 
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/personaPorPais",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Persona> obtenerPersonaPorPais(){
+        List<Persona> personaList = (List<Persona>) this.personaService.personasPorPais();
+        if(personaList.isEmpty()){
+            return new ResponseEntity("La lista esta vacia",HttpStatusCode.valueOf(400));
+        }
+        return new ResponseEntity(personaList,HttpStatusCode.valueOf(200));
+    }
 
 }
 

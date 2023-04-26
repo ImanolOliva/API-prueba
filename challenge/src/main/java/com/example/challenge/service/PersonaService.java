@@ -56,7 +56,7 @@ public class PersonaService {
     }
 
 
-    public String updatePersona(Persona persona,Long id){
+    public Persona updatePersona(Persona persona,Long id){
         try{
             Persona updatePersona = this.personaRepository.findById(id).get();
 
@@ -73,13 +73,14 @@ public class PersonaService {
             if(validacion(updatePersona) == 1){
                 throw  new InputsVaciosException();
             }
-            this.personaRepository.save(updatePersona);
-            return "";
+            updatePersona = this.personaRepository.save(updatePersona);
+            return updatePersona;
         }catch(ErrorUnknown errorUnknown){
-            return errorUnknown.getMessage();
+             errorUnknown.getMessage();
         }catch(Exception ex){
-            return ex.getMessage();
+             ex.getMessage();
         }
+        return  null;
 
 }
     public Persona deletePersona(Long id){
@@ -94,6 +95,12 @@ public class PersonaService {
            return null;
         }
     }
+
+
+    public List<Persona>  personasPorPais(){
+      return (List<Persona>) personaRepository.cantidadDePersonasPorPais();
+    }
+
 
     public Integer validacion(Persona persona){
         if (soloLetras(persona.getApellido()) == false ||soloLetras(persona.getPais())== false
